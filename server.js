@@ -5,19 +5,20 @@ const bcrypt = require('bcryptjs');
 require("dotenv").config(); 
 const jwt = require('jsonwebtoken');
 const app = express();
-const PORT = 5000; // Backend port
-// const DOTNET_API_URL = "http://localhost:56602"; // .NET Core API
-const DOTNET_API_URL = "http://10.131.30.31:81"; // .NET Core API
+// const PORT = 5000; // Backend port
+// const process.env.DOTNET_API_URL = "http://localhost:56602"; // .NET Core API
+// const process.env.DOTNET_API_URL = "http://10.131.30.31:81"; // .NET Core API
 
 app.use(
   cors({
     origin: "*", // Allow frontend
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT ", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.use(express.json());
+
 
 app.post("/api/login", async (req, res) => {
   try {
@@ -32,7 +33,7 @@ app.post("/api/login", async (req, res) => {
     let requestData = { LOGIN_ID, UserType, PASSWORD: PASSWORD || "", OTP: OTP || "" };
     console.log("Sending Request to .NET API:", requestData); // ✅ Log request before calling API
 
-    const response = await axios.post(`${DOTNET_API_URL}/api/Login?action=${action}`, requestData, {
+    const response = await axios.post(`${process.env.DOTNET_API_URL}/api/Login?action=${action}`, requestData, {
       headers: { "Content-Type": "application/json" },
     });
 
@@ -71,7 +72,7 @@ app.post("/api/auth/forgot-password", async (req, res) => {
     let requestData = { LOGIN_ID, EMAIL_ID };
     console.log("Sending Request to .NET API:", requestData); // ✅ Log request before calling API
 
-    const response = await axios.post(`${DOTNET_API_URL}/api/auth/forgot-password`, 
+    const response = await axios.post(`${process.env.DOTNET_API_URL}/api/auth/forgot-password`, 
     {
       LOGIN_ID: LOGIN_ID,
       EMAIL_ID: EMAIL_ID
@@ -98,7 +99,7 @@ app.post("/api/UpdatePassword", async (req, res) => {
       return res.status(400).json({ Status: "Missing required fields" });
     }
 
-    const response = await axios.post(`${DOTNET_API_URL}/api/UpdatePassword`, 
+    const response = await axios.post(`${process.env.DOTNET_API_URL}/api/UpdatePassword`, 
     {
       oldPassword: oldPassword,
       NewPassword: newPassword,
@@ -118,7 +119,7 @@ app.get("/api/UserProfile", async (req, res) => {
   try {
     const { LoginID } = req.query;
     console.log("Sending Request to .NET API:", LoginID); // ✅ Log request before calling API
-    const response = await axios.get(`${DOTNET_API_URL}/api/UserProfile`, {
+    const response = await axios.get(`${process.env.DOTNET_API_URL}/api/UserProfile`, {
       params: { LoginId: LoginID },  // ✅ Params should be inside this object
       headers: { "Content-Type": "application/json" },
     });
@@ -133,7 +134,7 @@ app.get("/api/UserProfile", async (req, res) => {
 app.get("/api/GetAllDistrictSummary", async (req, res) => {
   try {
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/DistrictWiseSummary/GetAllDistrictSummary`,
+      `${process.env.DOTNET_API_URL}/api/DistrictWiseSummary/GetAllDistrictSummary`,
       {
         headers: { "Content-Type": "application/json" },
       }
@@ -156,7 +157,7 @@ app.get("/api/Login/Menu", async (req, res) => {
 
     console.log("🔍 roleId being sent:", roleId); // Debugging
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/Login/Menu?userId=${roleId}`,
+      `${process.env.DOTNET_API_URL}/api/Login/Menu?userId=${roleId}`,
       {
         headers: { "Content-Type": "application/json" },
       }
@@ -171,7 +172,7 @@ app.get("/api/SubStation/GetSubStationData", async (req, res) => {
   try {
     const { dist_code, augmny } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SubStation/GetSubStationData`,
+      `${process.env.DOTNET_API_URL}/api/SubStation/GetSubStationData`,
       {
         params: { dist_code, augmny },
       },
@@ -192,7 +193,7 @@ app.get(
     try {
       const { dist_code, augmny } = req.query;
       const response = await axios.get(
-        `${DOTNET_API_URL}/api/SubStation/GetRemainingSolarCapacitySubstationsData`,
+        `${process.env.DOTNET_API_URL}/api/SubStation/GetRemainingSolarCapacitySubstationsData`,
         {
           params: { dist_code, augmny },
         },
@@ -211,7 +212,7 @@ app.get("/api/SubstationApi/GetSubStationStatus", async (req, res) => {
   try {
     const { dist_code, status1 } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SubstationApi/GetSubStationStatus`,
+      `${process.env.DOTNET_API_URL}/api/SubstationApi/GetSubStationStatus`,
       {
         params: { dist_code, status1 },
       },
@@ -231,7 +232,7 @@ app.get(
     try {
       const { dist_code, status1, aug_Y_N } = req.query;
       const response = await axios.get(
-        `${DOTNET_API_URL}/api/SubstationApi/GetAugmentationSubStationStatus`,
+        `${process.env.DOTNET_API_URL}/api/SubstationApi/GetAugmentationSubStationStatus`,
         {
           params: { dist_code, status1, aug_Y_N },
         },
@@ -250,7 +251,7 @@ app.get("/api/SubstationApi/GetTenderSubStationStatus", async (req, res) => {
   try {
     const { dist_code, status1, clusterNo } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SubstationApi/GetTenderSubStationStatus`,
+      `${process.env.DOTNET_API_URL}/api/SubstationApi/GetTenderSubStationStatus`,
       {
         params: { dist_code, status1, clusterNo },
       },
@@ -268,7 +269,7 @@ app.get("/api/SubstationApi/GetRemainingSubStationStatus", async (req, res) => {
   try {
     const { dist_code, status1 } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SubstationApi/GetRemainingSubStationStatus`,
+      `${process.env.DOTNET_API_URL}/api/SubstationApi/GetRemainingSubStationStatus`,
       {
         params: { dist_code, status1 },
       },
@@ -286,7 +287,7 @@ app.get("/api/TenderingSPVDashboard", async (req, res) => {
   try {
     const { sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/TenderingSPVDashboard`,
+      `${process.env.DOTNET_API_URL}/api/TenderingSPVDashboard`,
       {
         params: { sfile_id },
       },
@@ -305,7 +306,7 @@ app.get("/api/ClusterSummaryData", async (req, res) => {
   try {
     const { sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/ClusterSummaryData`,
+      `${process.env.DOTNET_API_URL}/api/ClusterSummaryData`,
       {
         params: { sfile_id },
       },
@@ -324,7 +325,7 @@ app.get("/api/ClusterSummaryAddEdit", async (req, res) => {
   try {
     const { v_clusterSummeryID, sfile_id, str_action } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/ClusterSummaryAddEdit`,
+      `${process.env.DOTNET_API_URL}/api/ClusterSummaryAddEdit`,
       {
         params: { v_clusterSummeryID, sfile_id, str_action },
       },
@@ -344,7 +345,7 @@ app.get("/api/LetterOfIntentData", async (req, res) => {
   try {
     const { sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/LetterOfIntentData`,
+      `${process.env.DOTNET_API_URL}/api/LetterOfIntentData`,
       {
         params: { sfile_id },
       },
@@ -364,7 +365,7 @@ app.get("/api/LetterOfIndentAddEdit", async (req, res) => {
     const { v_loiID, sfile_id, DistCode } = req.query;
 
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/LetterOfIndentAddEdit`,
+      `${process.env.DOTNET_API_URL}/api/LetterOfIndentAddEdit`,
       {
         params: { v_loiID, sfile_id, DistCode },
       },
@@ -386,7 +387,7 @@ app.get("/api/GetSummeryOfCapacity", async (req, res) => {
     const { DistCode, v_loiID } = req.query;
 
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/GetSummeryOfCapacity`,
+      `${process.env.DOTNET_API_URL}/api/GetSummeryOfCapacity`,
       {
         params: { DistCode, v_loiID },
       },
@@ -407,7 +408,7 @@ app.get("/api/GetSummeryOfCapacity", async (req, res) => {
 app.post("/api/InsertUpdateLetterOfIndent", async (req, res) => {
     try {   
         const response = await axios.post(
-            `${DOTNET_API_URL}/api/InsertUpdateLetterOfIndent`,
+            `${process.env.DOTNET_API_URL}/api/InsertUpdateLetterOfIndent`,
             req.body
         );
         res.json(response.data);
@@ -423,7 +424,7 @@ app.get("/api/MercAdoptionOrderData", async (req, res) => {
   try {
     const { sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/MercAdoptionOrderData`,
+      `${process.env.DOTNET_API_URL}/api/MercAdoptionOrderData`,
       {
         params: { sfile_id },
       },
@@ -443,7 +444,7 @@ app.get("/api/MercAdoptionOrderAddEdit", async (req, res) => {
     const { v_mercId, sfile_id, DistCode } = req.query;
 
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/MercAdoptionOrderAddEdit`,
+      `${process.env.DOTNET_API_URL}/api/MercAdoptionOrderAddEdit`,
       {
         params: { v_mercId, sfile_id, DistCode },
       },
@@ -463,7 +464,7 @@ app.get("/api/MercAdoptionOrderAddEdit", async (req, res) => {
 app.post("/api/InsertUpdateMercAdoptionOrder", async (req, res) => {
   try {   
       const response = await axios.post(
-          `${DOTNET_API_URL}/api/InsertUpdateMercAdoptionOrder`,
+          `${process.env.DOTNET_API_URL}/api/InsertUpdateMercAdoptionOrder`,
           req.body
       );
       res.json(response.data);
@@ -479,7 +480,7 @@ app.get("/api/RoleModelData", async (req, res) => {
   try {
     const { sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/RoleModelData`,
+      `${process.env.DOTNET_API_URL}/api/RoleModelData`,
       {
         params: { sfile_id },
       },
@@ -497,7 +498,7 @@ app.get("/api/UserRoleDataEdit", async (req, res) => {
   try {
     const { sRoleID, sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/UserRoleDataEdit`,
+      `${process.env.DOTNET_API_URL}/api/UserRoleDataEdit`,
       {
         params: { sRoleID, sfile_id },
       },
@@ -522,7 +523,7 @@ app.post("/api/InsertUpdateRoleData", async (req, res) => {
 
   try {   
       const response = await axios.post(
-          `${DOTNET_API_URL}/api/InsertUpdateRoleData`,
+          `${process.env.DOTNET_API_URL}/api/InsertUpdateRoleData`,
           req.body
       );
       console.log("📤 Forwarding to DOTNET API:", req.body);
@@ -539,7 +540,7 @@ app.get("/api/UserCreationData", async (req, res) => {
   try {
     const { sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/UserCreationData`,
+      `${process.env.DOTNET_API_URL}/api/UserCreationData`,
       {
         params: { sfile_id },
       },
@@ -558,7 +559,7 @@ app.get("/api/UserCreationDataEdit", async (req, res) => {
     const { LoginId } = req.query;
 
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/UserCreationDataEdit`,
+      `${process.env.DOTNET_API_URL}/api/UserCreationDataEdit`,
       {
         params: { LoginId },
       },
@@ -583,7 +584,7 @@ app.post("/api/InsertUpdateUserCreation", async (req, res) => {
 
   try {   
       const response = await axios.post(
-          `${DOTNET_API_URL}/api/InsertUpdateUserCreation`,
+          `${process.env.DOTNET_API_URL}/api/InsertUpdateUserCreation`,
           req.body
       );
       console.log("📤 Forwarding to DOTNET API:", req.body);
@@ -600,7 +601,7 @@ app.get("/api/ClusterSWPClearanceSummaryData", async (req, res) => {
   try {
     const { sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/ClusterSWPClearanceSummaryData`,
+      `${process.env.DOTNET_API_URL}/api/ClusterSWPClearanceSummaryData`,
       {
         params: { sfile_id },
       },
@@ -618,7 +619,7 @@ app.get("/api/OpenTenderSWPClearanceSummaryData", async (req, res) => {
   try {
     const { sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/OpenTenderSWPClearanceSummaryData`,
+      `${process.env.DOTNET_API_URL}/api/OpenTenderSWPClearanceSummaryData`,
       {
         params: { sfile_id },
       },
@@ -636,7 +637,7 @@ app.get("/api/SWPSubStationsClearanceSummaryData", async (req, res) => {
   try {
     const { projectCode, sfile_id, approachType } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SWPSubStationsClearanceSummaryData`,
+      `${process.env.DOTNET_API_URL}/api/SWPSubStationsClearanceSummaryData`,
       {
         params: { projectCode, sfile_id, approachType },
       },
@@ -654,7 +655,7 @@ app.get("/api/SWPClearanceSummaryStageWise", async (req, res) => {
   try {
     const { substationCode, ProjectCapacity, sfile_id, headerName, projectCode, approachType } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SWPClearanceSummaryStageWise`,
+      `${process.env.DOTNET_API_URL}/api/SWPClearanceSummaryStageWise`,
       {
         params: { substationCode, ProjectCapacity, sfile_id, headerName, projectCode, approachType },
       },
@@ -675,7 +676,7 @@ app.get("/api/SystemStrengtheningData", async (req, res) => {
   try {
     const { sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SystemStrengtheningData`,
+      `${process.env.DOTNET_API_URL}/api/SystemStrengtheningData`,
       {
         params: { sfile_id },
       },
@@ -693,7 +694,7 @@ app.get("/api/SystemStrengtheningSubStations", async (req, res) => {
   try {
     const { summaryId, ReferenceNo, approachType , Issplit, sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SystemStrengtheningSubStations`,
+      `${process.env.DOTNET_API_URL}/api/SystemStrengtheningSubStations`,
       {
         params: { summaryId, ReferenceNo, approachType , Issplit, sfile_id },
       },
@@ -711,7 +712,7 @@ app.get("/api/SystemStrengtheningSSNoDetails", async (req, res) => {
   try {
     const { SS_No, approachType , Issplit, sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SystemStrengtheningSSNoDetails`,
+      `${process.env.DOTNET_API_URL}/api/SystemStrengtheningSSNoDetails`,
       {
         params: { SS_No, approachType , Issplit, sfile_id },
       },
@@ -729,7 +730,7 @@ app.get("/api/SystemStrengtheningSubstationActivityStaus", async (req, res) => {
   try {
     const { mskvyType, Status, sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SystemStrengtheningSubstationActivityStaus`,
+      `${process.env.DOTNET_API_URL}/api/SystemStrengtheningSubstationActivityStaus`,
       {
         params: { mskvyType, Status, sfile_id },
       },
@@ -747,7 +748,7 @@ app.get("/api/SystemStrengtheningSSNoStatus", async (req, res) => {
   try {
     const { SS_No, mskvyType, Status, sfile_id } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SystemStrengtheningSSNoStatus`,
+      `${process.env.DOTNET_API_URL}/api/SystemStrengtheningSSNoStatus`,
       {
         params: { SS_No, mskvyType, Status, sfile_id },
       },
@@ -765,7 +766,7 @@ app.get("/api/SubstationsDoughnutClick", async (req, res) => {
   try {
     const { summaryId, ReferenceNo, approachType, Issplit, sfile_id, status } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SubstationsDoughnutClick`,
+      `${process.env.DOTNET_API_URL}/api/SubstationsDoughnutClick`,
       {
         params: { summaryId, ReferenceNo, approachType, Issplit, sfile_id, status },
       },
@@ -783,7 +784,7 @@ app.get("/api/SystemStrengtheningSSNoDetails_New", async (req, res) => {
   try {
     const { SS_No, summaryId, ReferenceNo, approachType, Issplit, sfile_id, status } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SystemStrengtheningSSNoDetails_New`,
+      `${process.env.DOTNET_API_URL}/api/SystemStrengtheningSSNoDetails_New`,
       {
         params: { SS_No, summaryId, ReferenceNo, approachType, Issplit, sfile_id, status },
       },
@@ -803,7 +804,7 @@ app.get("/api/projectExecutionSummary", async (req, res) => {
   try {
     // const { SS_No, summaryId, ReferenceNo, approachType, Issplit, sfile_id, status } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/projectExecutionSummary`,
+      `${process.env.DOTNET_API_URL}/api/projectExecutionSummary`,
       {
         headers: { "Content-Type": "application/json" },
       }
@@ -818,7 +819,7 @@ app.get("/api/GetBidderDetails", async (req, res) => {
   try {
     const { strBidder, infoType} = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/GetBidderDetails`,
+      `${process.env.DOTNET_API_URL}/api/GetBidderDetails`,
       {
         params: { strBidder, infoType },
       },
@@ -837,7 +838,7 @@ app.get("/api/GetBidderWiseDetails", async (req, res) => {
   try {
     const { ModelData, bidderName, District} = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/GetBidderWiseDetails`,
+      `${process.env.DOTNET_API_URL}/api/GetBidderWiseDetails`,
       {
         params: { ModelData, bidderName, District },
       },
@@ -855,7 +856,7 @@ app.get("/api/GetDistrictWiseDetails", async (req, res) => {
   try {
     const { ModelData, bidderName, District} = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/GetDistrictWiseDetails`,
+      `${process.env.DOTNET_API_URL}/api/GetDistrictWiseDetails`,
       {
         params: { ModelData, bidderName, District },
       },
@@ -873,7 +874,7 @@ app.get("/api/CommissionedSS", async (req, res) => {
   try {
     const { ModelData, apprType} = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/CommissionedSS`,
+      `${process.env.DOTNET_API_URL}/api/CommissionedSS`,
       {
         params: { ModelData, apprType },
       },
@@ -893,7 +894,7 @@ app.get("/api/SPVListForAdminDashboard", async (req, res) => {
   try {
     const { sfile_Id} = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/SPVListForAdminDashboard`,
+      `${process.env.DOTNET_API_URL}/api/SPVListForAdminDashboard`,
       {
         params: { sfile_Id },
       },
@@ -911,7 +912,7 @@ app.get("/api/AdminDashboardForSPV", async (req, res) => {
   try {
     const { PPA_Referance_No, sfile_Id} = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/AdminDashboardForSPV`,
+      `${process.env.DOTNET_API_URL}/api/AdminDashboardForSPV`,
       {
         params: { PPA_Referance_No, sfile_Id },
       },
@@ -929,7 +930,7 @@ app.get("/api/DashboardSPV", async (req, res) => {
   try {
     const { sfile_Id, Summary_Id, Reference_NO, ApproachType, Is_Split } = req.query;
     const response = await axios.get(
-      `${DOTNET_API_URL}/api/DashboardSPV`,
+      `${process.env.DOTNET_API_URL}/api/DashboardSPV`,
       {
         params: { sfile_Id, Summary_Id, Reference_NO, ApproachType, Is_Split },
       },
@@ -945,6 +946,6 @@ app.get("/api/DashboardSPV", async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Express Backend running on http://localhost:${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`🚀 Express Backend running on http://localhost:${process.env.PORT}`);
 });
